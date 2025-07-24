@@ -1,15 +1,31 @@
 mod fibonacci;
 mod median_mode;
+mod org_builder;
 mod pig_latin;
 mod temp_conversion;
 mod xmas_song;
-
+use std::collections::HashMap;
 const RUN_TEMP_COVERSION: bool = false;
 const RUN_FIB_TEST: bool = false;
 const RUN_XMAS_SONG: bool = false;
 const RUN_MEDIAN_MODE: bool = false;
-const RUN_PIG_LATIN: bool = true;
+const RUN_PIG_LATIN: bool = false;
+const RUN_ORG_BUILDER: bool = true;
 fn main() {
+    // org builder
+    if RUN_ORG_BUILDER {
+        let mut org = org_builder::Organisation::new();
+        org.add_employee("karen", "software");
+        // should see ["karen"]
+        org.print_dep("software");
+        org.print_dep("HR");
+        org.add_employee("Bea", "HR");
+        org.add_employee("Andy", "HR");
+        // should see: HR: ["Andy", "Bea"]
+        //             software: ["karen"]
+        org.print_all();
+    }
+
     //  pig latin
     if RUN_PIG_LATIN {
         pig_latin::test_pig_latin();
