@@ -1,4 +1,5 @@
 mod blog_oop;
+mod blog_type;
 mod fibonacci;
 mod median_mode;
 mod org_builder;
