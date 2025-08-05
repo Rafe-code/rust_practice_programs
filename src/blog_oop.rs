@@ -1,18 +1,24 @@
-/// Want a system which creates a blog post in 3 stages
-/// 1. create this as a draft
-/// 2. request review
-/// 3. create blog post
-///
-/// Should be able to add text to the draft version,
-/// request and approve review, and should not produce
-/// any requested content until approved, so that no accidental publishing
-/// Implement this using standard OOP practices here, and Rust Type like practices elsewhere
+//! Want a system which creates a blog post in 3 stages
+//! 1. create this as a draft
+//! 2. request review
+//! 3. create blog post
+//!
+//! Should be able to add text to the draft version,
+//! request and approve review, and should not produce
+//! any requested content until approved, so that no accidental publishing
+//! Implement this using standard OOP practices here, and Rust Type like practices elsewhere
 use std::any::Any;
 pub struct Post {
     content: String,
     state: Option<Box<dyn State>>,
 }
 
+/// Post is the wrapper struct that the user deals with
+/// It holds a State which is either:
+/// 1. Draft
+/// 2. Pending
+/// 3. Approved
+/// These are all separate structs which implement the State trait
 impl Post {
     pub fn new() -> Post {
         Post {
