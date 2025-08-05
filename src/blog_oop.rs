@@ -54,7 +54,7 @@ struct Draft {}
 
 impl State for Draft {
     fn request_review(self: Box<Self>) -> Box<dyn State> {
-        Box::new(Pending {})
+        Box::new(Pending { num_approvals: 0 })
     }
     fn approve(self: Box<Self>) -> Box<dyn State> {
         self
@@ -67,14 +67,26 @@ impl State for Draft {
     }
 }
 
-struct Pending {}
+struct Pending {
+    num_approvals: i32,
+}
 
 impl State for Pending {
     fn request_review(self: Box<Self>) -> Box<dyn State> {
         self
     }
-    fn approve(self: Box<Self>) -> Box<dyn State> {
-        Box::new(Published {})
+    fn approve(mut self: Box<Self>) -> Box<dyn State> {
+        match self.num_approvals {
+            0 => {
+                self.num_approvals += 1;
+                return self;
+            }
+            1 => return Box::new(Published {}),
+            _ => panic!(
+                "Pending state existed with {} approvals. Should only be 0 or 1",
+                self.num_approvals
+            ),
+        };
     }
     fn content<'a>(&self, _post: &'a Post) -> &'a str {
         ""
@@ -116,8 +128,10 @@ pub mod tests {
 
         post.reject();
         assert_eq!(post.content(), "");
-        post.request_review();
 
+        post.request_review();
+        post.approve();
+        assert_eq!(post.content(), "");
         post.approve();
         assert_eq!(post.content(), "This is a blog post.");
     }
