@@ -1,16 +1,16 @@
+mod blog_oop;
 mod fibonacci;
 mod median_mode;
 mod org_builder;
 mod pig_latin;
 mod temp_conversion;
 mod xmas_song;
-use std::collections::HashMap;
 const RUN_TEMP_COVERSION: bool = false;
 const RUN_FIB_TEST: bool = false;
 const RUN_XMAS_SONG: bool = false;
 const RUN_MEDIAN_MODE: bool = false;
 const RUN_PIG_LATIN: bool = false;
-const RUN_ORG_BUILDER: bool = true;
+const RUN_ORG_BUILDER: bool = false;
 fn main() {
     // org builder
     if RUN_ORG_BUILDER {
@@ -47,6 +47,6 @@ fn main() {
 
     // no test for this one, just print out the lyrics and look
     if RUN_XMAS_SONG {
-        xmas_song::print_lyrics_xmas()
+        _ = xmas_song::print_lyrics_xmas();
     }
 }

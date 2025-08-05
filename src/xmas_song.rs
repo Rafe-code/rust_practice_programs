@@ -26,7 +26,7 @@ const DAY_NAMES: [&str; 12] = [
     "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth",
     "eleventh", "twelfth",
 ];
-pub fn print_lyrics_xmas() {
+pub fn print_lyrics_xmas() -> String {
     let mut day_lyrics = String::new();
     for day_num in 1..NUM_DAYS + 1 {
         //  add base "on the Xth day of xmas..."
@@ -49,6 +49,7 @@ pub fn print_lyrics_xmas() {
         // print that day's gifts
         println!("{}", day_lyrics)
     }
+    day_lyrics
 }
 
 fn add_middle_days(mut day_lyrics: String, day_num: u32) -> String {
