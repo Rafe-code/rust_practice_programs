@@ -7,7 +7,7 @@
 /// request and approve review, and should not produce
 /// any requested content until approved, so that no accidental publishing
 /// Implement this using standard OOP practices here, and Rust Type like practices elsewhere
-
+use std::any::Any;
 pub struct Post {
     content: String,
     state: Option<Box<dyn State>>,
@@ -21,7 +21,11 @@ impl Post {
         }
     }
     pub fn add_text(&mut self, text: &str) {
-        self.content.push_str(text)
+        if let Some(ref state) = self.state {
+            if state.as_any().is::<Draft>() {
+                self.content.push_str(text)
+            }
+        }
     }
     pub fn content(&self) -> &str {
         self.state.as_ref().unwrap().content(self)
@@ -48,6 +52,7 @@ trait State {
     fn approve(self: Box<Self>) -> Box<dyn State>;
     fn content<'a>(&self, post: &'a Post) -> &'a str;
     fn reject(self: Box<Self>) -> Box<dyn State>;
+    fn as_any(&self) -> &dyn Any;
 }
 
 struct Draft {}
@@ -63,6 +68,9 @@ impl State for Draft {
         ""
     }
     fn reject(self: Box<Self>) -> Box<dyn State> {
+        self
+    }
+    fn as_any(&self) -> &dyn Any {
         self
     }
 }
@@ -94,6 +102,9 @@ impl State for Pending {
     fn reject(self: Box<Self>) -> Box<dyn State> {
         Box::new(Draft {})
     }
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
 }
 
 struct Published {}
@@ -109,6 +120,9 @@ impl State for Published {
         &post.content
     }
     fn reject(self: Box<Self>) -> Box<dyn State> {
+        self
+    }
+    fn as_any(&self) -> &dyn Any {
         self
     }
 }
@@ -133,6 +147,7 @@ pub mod tests {
         post.approve();
         assert_eq!(post.content(), "");
         post.approve();
+        post.add_text("This text should not appear.");
         assert_eq!(post.content(), "This is a blog post.");
     }
 }
