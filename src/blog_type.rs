@@ -30,6 +30,7 @@ impl DraftPost {
     pub fn request_review(self) -> Pending {
         Pending {
             content: self.content,
+            approval_count: 0,
         }
     }
     pub fn add_text(&mut self, text: &str) {
@@ -39,11 +40,33 @@ impl DraftPost {
 
 struct Pending {
     content: String,
+    approval_count: i32,
 }
 
 impl Pending {
+    pub fn approve(self) -> PendingHalf {
+        PendingHalf {
+            content: self.content,
+        }
+    }
+    pub fn reject(self) -> DraftPost {
+        DraftPost {
+            content: self.content,
+        }
+    }
+}
+struct PendingHalf {
+    content: String,
+}
+
+impl PendingHalf {
     pub fn approve(self) -> Approved {
         Approved {
+            content: self.content,
+        }
+    }
+    pub fn reject(self) -> DraftPost {
+        DraftPost {
             content: self.content,
         }
     }
@@ -69,6 +92,7 @@ mod test {
         let blog_text = "This is my blog post";
         post.add_text(blog_text);
         let post = post.request_review();
+        let post = post.approve();
         let post = post.approve();
         assert_eq!(post.content(), blog_text)
     }
