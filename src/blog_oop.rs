@@ -36,12 +36,18 @@ impl Post {
             self.state = Some(s.approve());
         }
     }
+    pub fn reject(&mut self) {
+        if let Some(s) = self.state.take() {
+            self.state = Some(s.reject());
+        }
+    }
 }
 
 trait State {
     fn request_review(self: Box<Self>) -> Box<dyn State>;
     fn approve(self: Box<Self>) -> Box<dyn State>;
     fn content<'a>(&self, post: &'a Post) -> &'a str;
+    fn reject(self: Box<Self>) -> Box<dyn State>;
 }
 
 struct Draft {}
@@ -55,6 +61,9 @@ impl State for Draft {
     }
     fn content<'a>(&self, _post: &'a Post) -> &'a str {
         ""
+    }
+    fn reject(self: Box<Self>) -> Box<dyn State> {
+        self
     }
 }
 
@@ -70,6 +79,9 @@ impl State for Pending {
     fn content<'a>(&self, _post: &'a Post) -> &'a str {
         ""
     }
+    fn reject(self: Box<Self>) -> Box<dyn State> {
+        Box::new(Draft {})
+    }
 }
 
 struct Published {}
@@ -83,6 +95,9 @@ impl State for Published {
     }
     fn content<'a>(&self, post: &'a Post) -> &'a str {
         &post.content
+    }
+    fn reject(self: Box<Self>) -> Box<dyn State> {
+        self
     }
 }
 
@@ -98,6 +113,10 @@ pub mod tests {
 
         post.request_review();
         assert_eq!(post.content(), "");
+
+        post.reject();
+        assert_eq!(post.content(), "");
+        post.request_review();
 
         post.approve();
         assert_eq!(post.content(), "This is a blog post.");
